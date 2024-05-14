@@ -1,9 +1,13 @@
 const { v4 } = require("uuid");
-const { dynamoClient } = require("../../../config/db");
+const dynamoDBClient  = require("../../../config/db");
 const User = require("../models/user");
 const IUserRepository = require("./IUserRepository");
 
 class UserRepository extends IUserRepository {
+    constructor() {
+        super()
+        this.dynamoDBInstance = dynamoDBClient.getInstance();
+      }
   async createUser(userData) {
     try {
       const {
@@ -31,7 +35,7 @@ class UserRepository extends IUserRepository {
         vehiculos,
       });
 
-      await dynamoClient
+      await this.dynamoDBInstance
         .put({
           TableName: "usersTable",
           Item: newUser,
@@ -49,7 +53,7 @@ class UserRepository extends IUserRepository {
 
   async getUsers(){
     try {
-        const result = await dynamoClient
+        const result = await this.dynamoDBInstance
           .scan({
             TableName: "usersTable"
           })
